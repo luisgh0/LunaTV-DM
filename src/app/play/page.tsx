@@ -497,7 +497,7 @@ function PlayPageClient() {
 
   // 检测移动设备（在组件层级定义）
   const userAgent = typeof navigator !== 'undefined' ? navigator.userAgent : '';
-  const isIOSGlobal = /iPad|iPhone|iPod/i.test(userAgent) && !window.MSStream;
+  const isIOSGlobal = /iPad|iPhone|iPod/i.test(userAgent) && !(window as any).MSStream;
   const isMobileGlobal = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent) || isIOSGlobal;
 
   // 内存压力检测和清理（针对移动设备）
@@ -1529,7 +1529,7 @@ function PlayPageClient() {
     // 检测移动设备和Safari浏览器
     const userAgent = typeof navigator !== 'undefined' ? navigator.userAgent : '';
     const isSafari = /^(?:(?!chrome|android).)*safari/i.test(userAgent);
-    const isIOS = /iPad|iPhone|iPod/i.test(userAgent) && !window.MSStream;
+    const isIOS = /iPad|iPhone|iPod/i.test(userAgent) && !(window as any).MSStream;
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent) || isIOS;
     const isWebKit = isSafari || isIOS;
 
