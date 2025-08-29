@@ -2,12 +2,12 @@
 
 'use client';
 
+import { Suspense, useEffect, useRef, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Heart } from 'lucide-react';
 import Artplayer from 'artplayer';
 import artplayerPluginDanmuku from 'artplayer-plugin-danmuku';
 import Hls from 'hls.js';
-import { Heart } from 'lucide-react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { Suspense, useEffect, useRef, useState } from 'react';
 
 
 import {
@@ -335,7 +335,7 @@ function PlayPageClient() {
           
           // 仅测试连通性和响应时间
           const startTime = performance.now();
-          const response = await fetch(episodeUrl, { 
+          await fetch(episodeUrl, { 
             method: 'HEAD', 
             mode: 'no-cors',
             signal: AbortSignal.timeout(3000) // 3秒超时
@@ -618,7 +618,6 @@ function PlayPageClient() {
       try {
         const memInfo = (performance as any).memory;
         const usedJSHeapSize = memInfo.usedJSHeapSize;
-        const totalJSHeapSize = memInfo.totalJSHeapSize;
         const heapLimit = memInfo.jsHeapSizeLimit;
         
         // 计算内存使用率
@@ -2090,7 +2089,7 @@ function PlayPageClient() {
         });
 
         // 监听播放进度跳转，优化弹幕重置
-        artPlayerRef.current.on('seek', (currentTime: number) => {
+        artPlayerRef.current.on('seek', () => {
           if (artPlayerRef.current?.plugins?.artplayerPluginDanmuku) {
             // 清除之前的重置计时器
             if (seekResetTimeoutRef.current) {
@@ -2266,9 +2265,10 @@ function PlayPageClient() {
           }
         }
 
-        // 保存播放进度逻辑
-        const saveNow = Date.now(); // 保存进度用Date.now()即可
-        let interval = process.env.NEXT_PUBLIC_STORAGE_TYPE === 'upstash' ? 20000 : 5000;
+        // 保存播放进度逻辑 - 优化所有存储类型的保存间隔
+        const saveNow = Date.now();
+        // upstash需要更长间隔避免频率限制，其他存储类型也适当降低频率减少性能开销
+        const interval = process.env.NEXT_PUBLIC_STORAGE_TYPE === 'upstash' ? 20000 : 10000; // 统一提高到10秒
         
         if (saveNow - lastSaveTimeRef.current > interval) {
           saveCurrentPlayProgress();
